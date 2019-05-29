@@ -31,9 +31,7 @@ func (l *Logger) Close() error {
 // New creates a new logging handler instance given a context.
 func (l *Logger) New(ctx ...Context) *Logger {
 	return &Logger{
-		ctx:       l.ctx.Union(ctx...),
-		formatter: l.formatter,
-		output:    l.output,
+		ctx: l.ctx.Union(ctx...),
 	}
 }
 
@@ -91,7 +89,17 @@ func (l *Logger) write(ctx Context, format string, args ...interface{}) {
 		return
 	}
 
-	b, err := l.formatter.Format(ctx.Union(Context{
+	formatter := l.formatter
+	if formatter == nil {
+		formatter = root.formatter
+	}
+
+	output := l.output
+	if output == nil {
+		output = root.output
+	}
+
+	b, err := formatter.Format(ctx.Union(Context{
 		"level":   levelMap[level],
 		"message": fmt.Sprintf(format, args...),
 		"time":    time.Now(),
@@ -101,5 +109,5 @@ func (l *Logger) write(ctx Context, format string, args ...interface{}) {
 		return
 	}
 
-	l.output.Write(b)
+	output.Write(b)
 }

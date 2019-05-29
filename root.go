@@ -6,7 +6,7 @@ import (
 
 var root = &Logger{
 	ctx:       make(Context),
-	formatter: new(TextFormatter),
+	formatter: &TextFormatter{},
 	level:     LevelInfo,
 	output:    os.Stdout,
 }
